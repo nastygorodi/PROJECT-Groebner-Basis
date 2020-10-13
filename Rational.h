@@ -1,29 +1,15 @@
 #include <iostream>
 #include <numeric>
 
-int gcd(int num, int denom) {
-    if (denom == 0)
-        return num;
-    return gcd(denom, num % denom);
-}
+using namespace Groebner;
 
+namespace Groebner {
 class Rational {
-private:
-    int numerator_, denominator_;
-    void reduce() {
-        int divider_ = gcd(numerator_, denominator_);
-        numerator_ /= divider_;
-        denominator_ /= divider_;
-        if (denominator_ < 0) {
-            numerator_ *= -1;
-            denominator_ *= -1;
-        }
-    }
-
 public:
-    Rational(int numerator = 0, int denominator = 1) {
-        numerator_ = numerator;
-        denominator_ = denominator;
+    Rational() = default;
+
+    Rational(int numerator, int denominator) : numerator_(numerator), denominator_(denominator) {
+        assert(denominator_ != 0);
         reduce();
     }
 
@@ -100,30 +86,42 @@ public:
         --*this;
         return cur;
     }
+private:
+int numerator_ = 0;
+int denominator_ = 1;
+void reduce() {
+    int divider_ = std::gcd(numerator_, denominator_);
+    numerator_ /= divider_;
+    denominator_ /= divider_;
+    if (denominator_ < 0) {
+        numerator_ *= -1;
+        denominator_ *= -1;
+    }
+}
 };
 
 Rational operator+(const Rational& first, const Rational& second) {
-    Rational current = first;
-    current += second;
-    return current;
+    Rational result = first;
+    result += second;
+    return result;
 }
 
 Rational operator-(const Rational& first, const Rational& second) {
-    Rational current = first;
-    current -= second;
-    return current;
+    Rational result = first;
+    result -= second;
+    return result;
 }
 
 Rational operator*(const Rational& first, const Rational& second) {
-    Rational current = first;
-    current *= second;
-    return current;
+    Rational result = first;
+    result *= second;
+    return result;
 }
 
 Rational operator/(const Rational& first, const Rational& second) {
-    Rational current = first;
-    current /= second;
-    return current;
+    Rational result = first;
+    result /= second;
+    return result;
 }
 
 bool operator==(const Rational& first, const Rational& second) {
@@ -135,9 +133,34 @@ bool operator!=(const Rational& first, const Rational& second) {
     return !(first == second);
 }
 
+bool operator<(const Rational& first, const Rational& second) {
+    if ((first - second).numerator() < 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool operator>(const Rational& first, const Rational& second) {
+    if ((first - second).numerator() > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool operator<=(const Rational& first, const Rational& second) {
+    return !(first > second);
+}
+
+bool operator>=(const Rational& first, const Rational& second) {
+    return !(first < second);
+}
+
 std::ostream& operator<<(std::ostream& out, const Rational& current) {
     out << current.numerator();
     out << "/";
     out << current.denominator();
     return out;
+};
 }

@@ -23,29 +23,23 @@ public:
 
 
     Rational operator+() const {
-        Rational x;
-        x.numerator_ = numerator_;
-        x.denominator_ = denominator_;
-        return x;
+        return *this;
     }
 
     Rational operator-() const {
-        Rational x;
-        x.numerator_ = -numerator_;
-        x.denominator_ = denominator_;
-        return x;
+        return Rational(-numerator_, denominator_);
     }
 
-    Rational& operator+=(const Rational& addendum) {
-        numerator_ = numerator_ * addendum.denominator_ + denominator_ * addendum.numerator_;
-        denominator_ *= addendum.denominator_;
+    Rational& operator+=(const Rational& other) {
+        numerator_ = numerator_ * other.denominator_ + denominator_ * other.numerator_;
+        denominator_ *= other.denominator_;
         reduce();
         return *this;
     }
 
-    Rational& operator-=(const Rational& subtrahend) {
-        numerator_ = numerator_ * subtrahend.denominator_ - denominator_ * subtrahend.numerator_;
-        denominator_ *= subtrahend.denominator_;
+    Rational& operator-=(const Rational& other) {
+        numerator_ = numerator_ * other.denominator_ - denominator_ * other.numerator_;
+        denominator_ *= other.denominator_;
         reduce();
         return *this;
     }
@@ -58,34 +52,13 @@ public:
     }
 
     Rational& operator/=(const Rational& divider) {
-        int cur = divider.numerator_;
+        assert(divider.numerator_ != 0);
         numerator_ *= divider.denominator_;
-        denominator_ *= cur;
+        denominator_ *= divider.numerator_;
         reduce();
         return *this;
     }
 
-    Rational& operator++() {
-        numerator_ += denominator_;
-        return *this;
-    }
-
-    Rational& operator--() {
-        numerator_ -= denominator_;
-        return *this;
-    }
-
-    Rational operator++(int) {
-        Rational cur = *this;
-        ++*this;
-        return cur;
-    }
-
-    Rational operator--(int) {
-        Rational cur = *this;
-        --*this;
-        return cur;
-    }
 private:
 int numerator_ = 0;
 int denominator_ = 1;

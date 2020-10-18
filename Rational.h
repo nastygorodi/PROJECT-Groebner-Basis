@@ -131,8 +131,10 @@ bool operator>=(const Rational& first, const Rational& second) {
 
 std::ostream& operator<<(std::ostream& out, const Rational& current) {
     out << current.numerator();
-    out << "/";
-    out << current.denominator();
+    if (current.denominator() != 1) {
+        out << "/";
+        out << current.denominator();
+    }
     return out;
 };
 }

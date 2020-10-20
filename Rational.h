@@ -7,11 +7,12 @@ public:
     using IntegralType = std::int64_t;
     Rational() = default;
 
-    Rational(IntegralType numerator, IntegralType denominator) : numerator_(numerator), denominator_(denominator) {
-        assert(denominator_ != 0);
+    Rational(IntegralType numerator) : numerator_(numerator) {
         reduce();
     }
-    Rational(IntegralType numerator) : numerator_(numerator) {
+
+    Rational(IntegralType numerator, IntegralType denominator) : numerator_(numerator), denominator_(denominator) {
+        assert(denominator_ != 0);
         reduce();
     }
 

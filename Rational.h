@@ -3,12 +3,15 @@
 
 namespace Groebner {
 class Rational {
-using IntegralType = std::int64_t;
 public:
+    using IntegralType = std::int64_t;
     Rational() = default;
 
     Rational(IntegralType numerator, IntegralType denominator) : numerator_(numerator), denominator_(denominator) {
         assert(denominator_ != 0);
+        reduce();
+    }
+    Rational(IntegralType numerator) : numerator_(numerator) {
         reduce();
     }
 
@@ -59,8 +62,6 @@ public:
     }
 
 private:
-    IntegralType numerator_ = 0;
-    IntegralType denominator_ = 1;
     void reduce() {
         IntegralType divider_ = std::gcd(numerator_, denominator_);
         numerator_ /= divider_;
@@ -70,6 +71,9 @@ private:
             denominator_ *= -1;
         }
     }
+
+    IntegralType numerator_ = 0;
+    IntegralType denominator_ = 1;
 };
 
 Rational operator+(const Rational& first, const Rational& second) {
@@ -106,19 +110,11 @@ bool operator!=(const Rational& first, const Rational& second) {
 }
 
 bool operator<(const Rational& first, const Rational& second) {
-    if ((first - second).numerator() < 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return (first - second).numerator() < 0;
 }
 
 bool operator>(const Rational& first, const Rational& second) {
-    if ((first - second).numerator() > 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return second < first;
 }
 
 bool operator<=(const Rational& first, const Rational& second) {

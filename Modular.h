@@ -1,8 +1,60 @@
 #include <iostream>
+#include <numeric>
+#include <optional>
+
+namespace Equations {
+using IntegralType = std::int64_t;
+
+//solve an equation ax + by = (a, b)
+IntegralType gcd_extended (IntegralType coeff_1, IntegralType coeff_2, IntegralType& x, IntegralType& y) {
+    IntegralType divider, quotient, remainder, x2, x1, y2, y1;
+    if (coeff_2 == 0) {
+        x = 1;
+        y = 0;
+        divider = coeff_1;
+        return divider;
+    }
+    x2 = 1;
+    x1 = 0;
+    y2 = 0;
+    y1 = 1;
+    while (coeff_2 > 0) {
+        quotient = coeff_1 / coeff_2;
+        remainder = coeff_1 - quotient * coeff_2;
+        x = x2 - quotient * x1;
+        y = y2 - quotient * y1;
+        coeff_1 = coeff_2;
+        coeff_2 = remainder;
+        x2 = x1;
+        x1 = x;
+        y2 = y1;
+        y1 = y;
+    }
+    divider = coeff_1;
+    x = x2;
+    y = y2;
+    return divider;
+}
+
+std::optional<std::pair<IntegralType, IntegralType>> solve_equation (IntegralType coeff_1, IntegralType coeff_2, IntegralType coeff_3, IntegralType& param_1, IntegralType& param_2) {
+    IntegralType divider = gcd_extended(coeff_1, coeff_2, param_1, param_2);
+    //если (a, b) не делит const --> реш-й не сущ.
+    if (coeff_3 % divider != 0) {
+        return {};
+    }
+    //находили для ax + by = (a, b) --> чтобы получить решение диофантова ур-я \cdot const/(a, b)
+    param_1 *= coeff_3 / divider;
+    param_2 *= coeff_3 / divider;
+    return std::pair(param_1, param_2);
+}
+}
 
 namespace Groebner {
+using namespace Equations;
+
 template < std::int64_t mod >
 class Modular {
+static_assert(mod > 0, "The modulus must be positive!");
 public:
     using IntegralType = std::int64_t;
     Modular() = default;
@@ -20,7 +72,7 @@ public:
     }
 
     Modular operator-() const {
-        return Modular(mod - number_);
+        return Modular(-number_);
     }
 
     Modular& operator+=(const Modular& other) {
@@ -41,38 +93,13 @@ public:
         return *this;
     }
 
-    //жесть
-
-    IntegralType reduce_Euclid (IntegralType a, IntegralType b, IntegralType& x, IntegralType& y) {
-        if (a == 0) {
-            x = 0;
-            y = 1;
-            return b;
-        }
-        IntegralType x_, y_;
-        IntegralType d = reduce_Euclid(b % a, a, x_, y_);
-        x = y_ - x_ * (b / a);
-        y = x_;
-        return d;
-    }
-
-    bool solution_Euclid (IntegralType a, IntegralType b, IntegralType c, IntegralType& x, IntegralType& y, IntegralType& g) {
-        g = reduce_Euclid(a, b, x, y);
-        if (c % g != 0) {
-            return false;
-        }
-        x *= c / g;
-        y *= c / g;
-        return true;
-    }
-
-
     Modular& operator/=(const Modular& divider) {
-        assert(divider.number_ != 0);
-        Modular x, y, g;
-        if (solution_Euclid(divider.number_, mod, number_, x.number_, y.number_, g.number_)) {
-            number_ = x.number_;
-        };
+        assert(std::gcd(divider.number_, mod) == 1);
+        IntegralType param_1, param_2;
+        std::optional<std::pair<IntegralType, IntegralType>> solution = solve_equation(divider.number_, mod, number_, param_1, param_2);
+        if (solution != std::nullopt) {
+            number_ = (*solution).first;
+        }
         reduce();
         return *this;
     }
@@ -135,4 +162,4 @@ private:
 
     IntegralType number_ = 0;
 };
-};
+}

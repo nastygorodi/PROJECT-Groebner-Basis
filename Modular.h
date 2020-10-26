@@ -1,6 +1,5 @@
 #include <iostream>
 #include <numeric>
-#include <optional>
 
 namespace Equations {
 template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>

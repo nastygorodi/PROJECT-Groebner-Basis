@@ -157,7 +157,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const Modular& current) {
         return out << current.canonical_remainder();
-    };
+    }
 private:
     void reduce() {
         number_ = ((number_ % mod) + mod) % mod;

@@ -5,26 +5,39 @@
 namespace Groebner {
 class Monomial {
 public:
-    using IntegralType = std::int64_t;
+    using IndexType = std::int64_t;
+    using DegreeType = std::uint64_t;
 
     Monomial () = default;
 
-    Monomial (std::initializer_list<std::pair<IntegralType, IntegralType>> list) {
+    Monomial (std::initializer_list<std::pair<IndexType, DegreeType>> list) {
         for (auto pair : list) {
-            degrees_[pair.first] = pair.second;
+            if (pair.second != 0) {
+                auto result = degrees_.try_emplace(pair.first, pair.second);
+                assert(result.second);
+            }
         }
     }
 
+    DegreeType degree_of_variable (IndexType index) const{
+        auto it = degrees_.find(index);
+        if (it != degrees_.end()) {
+            return it->second;
+        }
+        return 0;
+    }
+
     Monomial& operator*=(const Monomial& factor) {
-        for (auto& degree : factor.degrees_) {
-            (*this).degrees_[degree.first] += degree.second;
+        for (const auto& degree : factor.degrees_) {
+            degrees_[degree.first] += degree.second;
         }
         return *this;
     }
 
-    bool operator|(Monomial& other) const{
-        for (auto& degree : (*this).degrees_) {
-            if (other.degrees_[degree.first] < degree.second) {
+    bool divides(const Monomial& other) const{
+        for (const auto& degree : degrees_) {
+            auto it = other.degrees_.find(degree.first);
+            if (it == other.degrees_.end() || other.degree_of_variable(degree.first) < degree.second) {
                 return false;
             }
         }
@@ -32,35 +45,50 @@ public:
     }
 
     Monomial& operator/=(const Monomial& divider) {
-        assert(divider | (*this));
-        for (auto& degree : divider.degrees_) {
-            (*this).degrees_[degree.first] -= degree.second;
-        }  
+        assert(divider.divides(*this));
+        for (const auto& degree : divider.degrees_) {
+            degrees_[degree.first] -= degree.second;
+        }
+        reduce();
         return *this;
     }
 
-    friend Monomial gcd_of_monomials(Monomial& first, Monomial& second) {
+    static Monomial gcd(const Monomial& first, const Monomial& second) {
         Monomial result;
-        for (auto& degree : first.degrees_) {
-            result.degrees_[degree.first] = std::min(degree.second, second.degrees_[degree.first]);
+        for(const auto& degree : first.degrees_) {
+            auto gcd_degree = std::min(degree.second, second.degree_of_variable(degree.first));
+            if (gcd_degree > 0)
+            result.degrees_.emplace(std::make_pair(degree.first, gcd_degree));
         }
         return result;
     }
 
     friend std::ostream& operator<<(std::ostream& out, const Monomial& current) {
         for (auto& degree : current.degrees_) {
-            if (degree.second != 0) {
-                out << "x_" << degree.first;
-                if (degree.second != 1) {
-                    out << "^" << degree.second;
-                }
+            assert(degree.second);
+            out << "x_" << degree.first;
+            if (degree.second != 1) {
+                out << "^" << degree.second;
             }
         }
         return out;
-    };
-
+    }
 private:
-    std::map<IntegralType, IntegralType> degrees_;
+    void reduce() {
+        auto it = degrees_.end();
+        --it;
+        while (it != degrees_.begin()) {
+            if (it->second == 0) {
+                degrees_.erase(it);
+            }
+            --it;
+        }
+        if (it->second == 0) {
+                degrees_.erase(it);
+        }
+    }
+
+    std::map<IndexType, DegreeType> degrees_;
 };
 
 Monomial operator*(const Monomial& first, const Monomial& second) {

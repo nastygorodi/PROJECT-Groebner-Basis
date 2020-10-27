@@ -8,9 +8,9 @@ public:
     using IndexType = std::int64_t;
     using DegreeType = std::uint64_t;
 
-    Monomial () = default;
+    Monomial() = default;
 
-    Monomial (std::initializer_list<std::pair<IndexType, DegreeType>> list) {
+    Monomial(std::initializer_list<std::pair<IndexType, DegreeType>> list) {
         for (auto pair : list) {
             if (pair.second != 0) {
                 auto result = degrees_.try_emplace(pair.first, pair.second);
@@ -19,7 +19,7 @@ public:
         }
     }
 
-    DegreeType degree_of_variable (IndexType index) const{
+    DegreeType degree_of_variable(IndexType index) const {
         auto it = degrees_.find(index);
         if (it != degrees_.end()) {
             return it->second;
@@ -34,7 +34,7 @@ public:
         return *this;
     }
 
-    bool is_divisible_by(const Monomial& other) const{
+    bool is_divisible_by(const Monomial& other) const {
         for (const auto& degree : degrees_) {
             if (other.degree_of_variable(degree.first) > degree.second) {
                 return false;

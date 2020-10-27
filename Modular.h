@@ -3,7 +3,7 @@
 #include <numeric>
 
 namespace Groebner {
-template < std::int64_t mod >
+template <std::int64_t mod>
 class Modular {
 static_assert(mod > 0, "The modulus must be positive!");
 public:
@@ -101,7 +101,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const Modular& current) {
         return out << current.canonical_remainder();
-    };
+    }
 private:
     void reduce() {
         number_ = ((number_ % mod) + mod) % mod;

@@ -9,15 +9,7 @@ struct GCDResult {
 };
 
 template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
-struct DiophantineSolution {
-    TIntegralType first_coefficient;
-    TIntegralType second_coefficient;
-};
-
-//solve an equation ax + by = (a, b)
-template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
 GCDResult<TIntegralType> gcd_extended (TIntegralType value1, TIntegralType value2) {
-    TIntegralType divider, quotient, remainder;
     if (value2 == 0) {
         return {value1, 1, 0};
     }
@@ -41,8 +33,14 @@ GCDResult<TIntegralType> gcd_extended (TIntegralType value1, TIntegralType value
 }
 
 template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
+struct DiophantineSolution {
+    TIntegralType first_coefficient;
+    TIntegralType second_coefficient;
+};
+
+template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
 DiophantineSolution<TIntegralType> solve_equation (TIntegralType value1, TIntegralType value2, TIntegralType rhs) {
-    auto result = gcd_extended<TIntegralType>(value1, value2);
+    auto result = gcd_extended(value1, value2);
     assert(rhs % result.gcd == 0);
     return {result.first_coefficient * rhs / result.gcd, result.second_coefficient * rhs / result.gcd};
 }

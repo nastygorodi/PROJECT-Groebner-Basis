@@ -34,10 +34,9 @@ public:
         return *this;
     }
 
-    bool divides(const Monomial& other) const{
+    bool is_divisible_by(const Monomial& other) const{
         for (const auto& degree : degrees_) {
-            auto it = other.degrees_.find(degree.first);
-            if (it == other.degrees_.end() || other.degree_of_variable(degree.first) < degree.second) {
+            if (other.degree_of_variable(degree.first) > degree.second) {
                 return false;
             }
         }
@@ -45,11 +44,13 @@ public:
     }
 
     Monomial& operator/=(const Monomial& divider) {
-        assert(divider.divides(*this));
+        assert(is_divisible_by(divider));
         for (const auto& degree : divider.degrees_) {
             degrees_[degree.first] -= degree.second;
+            if (degrees_[degree.first] == 0) {
+                degrees_.erase(degree.first);
+            }
         }
-        reduce();
         return *this;
     }
 
@@ -58,7 +59,7 @@ public:
         for(const auto& degree : first.degrees_) {
             auto gcd_degree = std::min(degree.second, second.degree_of_variable(degree.first));
             if (gcd_degree > 0)
-            result.degrees_.emplace(std::make_pair(degree.first, gcd_degree));
+            result.degrees_.emplace(degree.first, gcd_degree);
         }
         return result;
     }
@@ -72,19 +73,16 @@ public:
             }
         }
         return out;
-    }
+    };
 private:
     void reduce() {
-        auto it = degrees_.end();
-        --it;
-        while (it != degrees_.begin()) {
-            if (it->second == 0) {
-                degrees_.erase(it);
+        auto it = degrees_.cbegin();
+        while (it != degrees_.cend()) {
+            if (it ->second == 0) {
+                it = degrees_.erase(it);
+            } else {
+                ++it;
             }
-            --it;
-        }
-        if (it->second == 0) {
-                degrees_.erase(it);
         }
     }
 

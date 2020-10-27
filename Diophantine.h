@@ -9,7 +9,7 @@ struct GCDResult {
 };
 
 template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
-GCDResult<TIntegralType> gcd_extended (TIntegralType value1, TIntegralType value2) {
+GCDResult<TIntegralType> gcd_extended(TIntegralType value1, TIntegralType value2) {
     if (value2 == 0) {
         return {value1, 1, 0};
     }
@@ -39,7 +39,7 @@ struct DiophantineSolution {
 };
 
 template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
-DiophantineSolution<TIntegralType> solve_equation (TIntegralType value1, TIntegralType value2, TIntegralType rhs) {
+DiophantineSolution<TIntegralType> solve_equation(TIntegralType value1, TIntegralType value2, TIntegralType rhs) {
     auto result = gcd_extended(value1, value2);
     assert(rhs % result.gcd == 0);
     return {result.first_coefficient * rhs / result.gcd, result.second_coefficient * rhs / result.gcd};

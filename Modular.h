@@ -1,62 +1,6 @@
+#include"Diophantine.h"
 #include <iostream>
 #include <numeric>
-
-namespace Equations {
-template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
-struct GCDResult {
-    TIntegralType gcd;
-    TIntegralType first_coefficient;
-    TIntegralType second_coefficient;
-};
-
-template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
-struct DiophantineSolution {
-    TIntegralType first_coefficient;
-    TIntegralType second_coefficient;
-};
-
-//solve an equation ax + by = (a, b)
-template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
-GCDResult<TIntegralType> gcd_extended (TIntegralType value1, TIntegralType value2) {
-    TIntegralType divider, quotient, remainder, x, x2, x1, y, y2, y1;
-    if (value2 == 0) {
-        x = 1;
-        y = 0;
-        divider = value1;
-        return {divider, x, y};
-    }
-    x2 = 1;
-    x1 = 0;
-    y2 = 0;
-    y1 = 1;
-    while (value2 > 0) {
-        quotient = value1 / value2;
-        remainder = value1 - quotient * value2;
-        x = x2 - quotient * x1;
-        y = y2 - quotient * y1;
-        value1 = value2;
-        value2 = remainder;
-        x2 = x1;
-        x1 = x;
-        y2 = y1;
-        y1 = y;
-    }
-    divider = value1;
-    x = x2;
-    y = y2;
-    return {divider, x, y};
-}
-
-template <class TIntegralType, class = std::enable_if_t <std::is_integral_v <TIntegralType>>>
-DiophantineSolution<TIntegralType> solve_equation (TIntegralType value1, TIntegralType value2, TIntegralType rhs) {
-    DiophantineSolution<TIntegralType> solution;
-    auto result = gcd_extended<TIntegralType>(value1, value2);
-    assert(rhs % result.gcd == 0);
-    solution.first_coefficient = result.first_coefficient * rhs / result.gcd;
-    solution.second_coefficient = result.second_coefficient * rhs / result.gcd;
-    return solution;
-}
-}
 
 namespace Groebner {
 template < std::int64_t mod >
@@ -157,7 +101,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const Modular& current) {
         return out << current.canonical_remainder();
-    }
+    };
 private:
     void reduce() {
         number_ = ((number_ % mod) + mod) % mod;

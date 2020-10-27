@@ -8,13 +8,13 @@ class Modular {
 static_assert(mod > 0, "The modulus must be positive!");
 public:
     using IntegralType = std::int64_t;
-    Modular() = default;
+    Modular () = default;
 
     Modular(IntegralType number) : number_(number) {
         reduce();
     }
 
-    IntegralType canonical_remainder() const{
+    IntegralType canonical_remainder() const {
         return number_;
     }
 

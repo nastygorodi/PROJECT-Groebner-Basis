@@ -27,6 +27,10 @@ public:
         return 0;
     }
 
+    const std::map<IndexType, DegreeType>& get_degrees() const{
+        return degrees_;
+    }
+
     Monomial& operator*=(const Monomial& factor) {
         for (const auto& degree : factor.degrees_) {
             degrees_[degree.first] += degree.second;
@@ -94,6 +98,7 @@ Monomial operator*(const Monomial& first, const Monomial& second) {
     result *= second;
     return result;
 }
+
 Monomial operator/(const Monomial& first, const Monomial& second) {
     Monomial result = first;
     result /= second;

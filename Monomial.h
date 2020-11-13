@@ -39,12 +39,11 @@ public:
     }
 
     bool is_divisible_by(const Monomial& other) const {
-        for (const auto& degree : degrees_) {
-            if (other.degree_of_variable(degree.first) > degree.second) {
+        for (const auto& degree : other.degrees_) {
+            if (degree_of_variable(degree.first) < degree.second)
                 return false;
-            }
         }
-        return true;
+        return true;        
     }
 
     Monomial& operator/=(const Monomial& divider) {
@@ -60,7 +59,7 @@ public:
 
     static Monomial gcd(const Monomial& first, const Monomial& second) {
         Monomial result;
-        for(const auto& degree : first.degrees_) {
+        for (const auto& degree : first.degrees_) {
             auto gcd_degree = std::min(degree.second, second.degree_of_variable(degree.first));
             if (gcd_degree > 0)
             result.degrees_.emplace(degree.first, gcd_degree);
@@ -77,19 +76,9 @@ public:
             }
         }
         return out;
-    };
-private:
-    void reduce() {
-        auto it = degrees_.cbegin();
-        while (it != degrees_.cend()) {
-            if (it ->second == 0) {
-                it = degrees_.erase(it);
-            } else {
-                ++it;
-            }
-        }
     }
 
+private:
     std::map<IndexType, DegreeType> degrees_;
 };
 

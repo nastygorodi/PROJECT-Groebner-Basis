@@ -65,7 +65,7 @@ public:
         return T::cmp(first, second);
     }
     
-    bool operator()(const Monomial& first, const Monomial& second) {
+    bool operator()(const Monomial& first, const Monomial& second) const {
         return cmp(first, second);
     }
 };
@@ -85,6 +85,10 @@ class Reverse {
 public:
     static bool cmp(const Monomial& first, const Monomial& second) {
         return T::cmp(second, first);
+    }
+    
+    bool operator()(const Monomial& first, const Monomial& second) const {
+        return cmp(first, second);
     }
 };
 }

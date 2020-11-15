@@ -14,7 +14,7 @@ public:
         if( position1 == first.get_degrees().end()) {
             return true;
         }
-        return *position1 < *position2;
+        return position1->first > position2->first ||  (position1->first == position2->first && position1->second < position2->second);
     }
 
     bool operator()(const Monomial& first, const Monomial& second) const {
@@ -83,7 +83,7 @@ public:
     }
     
     bool operator()(const Monomial& first, const Monomial& second) const {
-        return cmp(first, second);
+        return cmp(first , second);
     }
 };
 }

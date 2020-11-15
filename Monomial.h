@@ -27,7 +27,7 @@ public:
         return 0;
     }
 
-    const std::map<IndexType, DegreeType>& get_degrees() const{
+    const std::map<IndexType, DegreeType>& get_degrees() const {
         return degrees_;
     }
 
@@ -40,8 +40,9 @@ public:
 
     bool is_divisible_by(const Monomial& other) const {
         for (const auto& degree : other.degrees_) {
-            if (degree_of_variable(degree.first) < degree.second)
+            if (degree_of_variable(degree.first) < degree.second) {
                 return false;
+            }
         }
         return true;        
     }

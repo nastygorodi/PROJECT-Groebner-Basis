@@ -1,3 +1,4 @@
+#pragma once
 #include"Diophantine.h"
 #include <iostream>
 #include <numeric>

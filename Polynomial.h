@@ -1,9 +1,10 @@
+#pragma once
 #include <initializer_list>
 #include <iostream>
 #include <map>
 #include <math.h>
 #include "Modular.h"
-//#include "Monomial.h"
+#include "Monomial.h"
 #include "Order.h"
 #include "Rational.h"
 
@@ -12,18 +13,23 @@ namespace Groebner {
 template <class Coeff, class Order>
 class Polynomial {
 public:
+    using TermsContainer = std::map<Monomial, Coeff, Reverse<Order>>;
     Polynomial() = default;
 
-    Polynomial(std::initializer_list<std::pair<Monomial, Coeff>> terms) {
+    Polynomial(Coeff coefficient) {
+        terms_.emplace(Monomial(), std::move(coefficient));
+    }
+
+    Polynomial(std::initializer_list<std::pair<Coeff, Monomial>> terms) {
         for (auto term : terms) {
-            if (term.second != 0) {
-                auto result = terms_.try_emplace(term.first, term.second);
+            if (term.first != 0) {
+                auto result = terms_.try_emplace(term.second, term.first);
                 assert(result.second);
             }
         }
     }
 
-    Coeff coeff_of_term(const Monomial& m) const {
+    Coeff coeff_of(const Monomial& m) const {
         auto it = terms_.find(m);
         if (it != terms_.end()) {
             return it->second;
@@ -31,32 +37,28 @@ public:
         return 0;
     }
 
-    const std::map<Monomial, Coeff, Reverse<Order>>& get_terms() const {
+    const TermsContainer& get_terms() const {
         return terms_;
     }
 
     Polynomial& operator+=(const Polynomial& other) {
         for (const auto& term : other.terms_) {
-            if (coeff_of_term(term.first) == 0) {
-                auto result = terms_.try_emplace(term.first, term.second);
-                assert(result.second);
-            } else {
-                terms_[term.first] += term.second;
+            terms_[term.first] += term.second;
+            if (coeff_of(term.first) == 0) {
+                terms_.erase(term.first);
             }
         }
-        reduce();
         return *this;
     }
 
     Polynomial& operator*=(const Polynomial& factor) {
-        Polynomial result;
+        TermsContainer result;
         for (const auto& term1 : terms_) {
             for (const auto& term2 : factor.terms_) {
-                auto check = result.terms_.try_emplace(term1.first * term2.first, term1.second * term2.second);
-                assert(check.second);
+                result[term1.first * term2.first] += term1.second * term2.second;
             }
         }
-        terms_ = result.terms_;
+        terms_ = std::move(result);
         reduce();
         return *this;
     }
@@ -104,6 +106,6 @@ private:
         }
     }
 
-    std::map<Monomial, Coeff, Reverse<Order>> terms_;
+    TermsContainer terms_;
 };
 }

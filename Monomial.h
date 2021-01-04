@@ -66,6 +66,19 @@ public:
         }
         return result;
     }
+    
+    //least common multiple
+    static Monomial lcm(const Monomial& first, const Monomial& second) {
+        Monomial result = first;
+        for (const auto& degree : second.degrees_) {
+            if (result.degree_of_variable(degree.first) == 0) {
+                result.degrees_.emplace(degree.first, degree.second);
+            } else {
+                result.degrees_[degree.first] = std::max(result.degree_of_variable(degree.first), degree.second);
+            }
+        }
+        return result;
+    }
 
     friend std::ostream& operator<<(std::ostream& out, const Monomial& current) {
         for (auto& degree : current.degrees_) {

@@ -9,10 +9,10 @@ public:
     static bool cmp(const Monomial& first, const Monomial& second) {
         const auto& [position1, position2] = std::mismatch(first.get_degrees().begin(), first.get_degrees().end(),
                                                  second.get_degrees().begin(), second.get_degrees().end());
-        if(position2 == second.get_degrees().end()) {
+        if (position2 == second.get_degrees().end()) {
             return false;
         }
-        if( position1 == first.get_degrees().end()) {
+        if (position1 == first.get_degrees().end()) {
             return true;
         }
         return position1->first > position2->first ||  (position1->first == position2->first && position1->second < position2->second);

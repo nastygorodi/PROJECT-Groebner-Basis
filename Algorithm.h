@@ -29,11 +29,8 @@ public:
         return result;
     }
 
-    static void elementary_reduction(Polynomial<Coeff, Order>& g, const Polynomial<Coeff, Order>& f) {
-        auto it = g.get_terms().begin();
-        while ((it != g.get_terms().end()) && (!(it->first).is_divisible_by(L(f)))) {
-            ++it;
-        }
+    static void make_reduction(Polynomial<Coeff, Order>& g, const Polynomial<Coeff, Order>& f) {
+        auto it = reduction_check(g, f).second;
         if (it != g.get_terms().end()) {
             auto m1 = it->first / L(f);
             g = f.coeff_of(L(f)) * g - it->second * (m1 * f);
@@ -54,7 +51,7 @@ public:
 
     static void complete_reduction(Polynomial<Coeff, Order>& g, const Polynomial<Coeff, Order>& f) {
         while (reduction_check(g, f).first == true) {
-            elementary_reduction(g, f);
+            make_reduction(g, f);
         }
     }
 };

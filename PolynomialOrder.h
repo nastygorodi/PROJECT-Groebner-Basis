@@ -15,14 +15,14 @@ public:
                                                             !Order::cmp(s.first, f.first) && f.second == s.second);
                                                     });
         if (position2 == second.get_terms().end()) {
-            return false;
-        }
-        if (position1 == first.get_terms().end()) {
             return true;
         }
-        return Order::cmp(position1->first, position2->first) ||  
+        if (position1 == first.get_terms().end()) {
+            return false;
+        }
+        return Order::cmp(position2->first, position1->first) ||  
                 (!Order::cmp(position1->first, position2->first) && !Order::cmp(position2->first, position1->first) 
-                        && position1->second < position2->second);
+                        && position1->second > position2->second);
     }
 
     bool operator()(const Polynomial<Coeff, Order>& first, const Polynomial<Coeff, Order>& second) const {

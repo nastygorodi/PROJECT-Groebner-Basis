@@ -19,7 +19,8 @@ public:
     Polynomial(Coeff coefficient) {
         terms_.emplace(Monomial(), std::move(coefficient));
     }
-    
+
+    //?
     Polynomial(const Monomial& m) {
         terms_.emplace(m, Coeff(1));
     }
@@ -45,6 +46,17 @@ public:
         return terms_;
     }
 
+    void norm() {
+        if (terms_.size() == 0) {
+            return;
+        }
+        auto first_coeff = terms_.begin()->second;
+        for (auto& term : terms_) {
+            terms_[term.first] /= first_coeff;
+        }
+        return;
+    }
+    
     Polynomial& operator+=(const Polynomial& other) {
         for (const auto& term : other.terms_) {
             terms_[term.first] += term.second;
@@ -54,7 +66,8 @@ public:
         }
         return *this;
     }
-    
+
+    //?
     Polynomial& operator-=(const Polynomial& other) {
         for (const auto& term : other.terms_) {
             terms_[term.first] -= term.second;
@@ -82,7 +95,8 @@ public:
         result += second;
         return result;
     }
-    
+
+    //?
     friend Polynomial operator-(const Polynomial& first, const Polynomial& second) {
         Polynomial result = first;
         result -= second;

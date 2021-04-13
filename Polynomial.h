@@ -52,7 +52,7 @@ public:
         }
         auto first_coeff = terms_.begin()->second;
         for (auto& term : terms_) {
-            terms_[term.first] /= first_coeff;
+            term.second /= first_coeff;
         }
         return;
     }

@@ -1,3 +1,4 @@
+#pragma once
 #include <initializer_list>
 #include <iostream>
 #include <map>
@@ -27,7 +28,7 @@ public:
         return 0;
     }
 
-    const std::map<IndexType, DegreeType>& get_degrees() const{
+    const std::map<IndexType, DegreeType>& get_degrees() const {
         return degrees_;
     }
 
@@ -40,8 +41,9 @@ public:
 
     bool is_divisible_by(const Monomial& other) const {
         for (const auto& degree : other.degrees_) {
-            if (degree_of_variable(degree.first) < degree.second)
+            if (degree_of_variable(degree.first) < degree.second) {
                 return false;
+            }
         }
         return true;        
     }
@@ -66,7 +68,7 @@ public:
         }
         return result;
     }
-    
+
     //least common multiple
     static Monomial lcm(const Monomial& first, const Monomial& second) {
         Monomial result = first;
@@ -78,6 +80,10 @@ public:
             }
         }
         return result;
+    }
+
+    friend bool operator==(const Monomial& first, const Monomial& second) {
+        return first.degrees_ == second.degrees_;
     }
 
     friend std::ostream& operator<<(std::ostream& out, const Monomial& current) {

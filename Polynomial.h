@@ -8,7 +8,6 @@
 #include "Order.h"
 #include "Rational.h"
 
-
 namespace Groebner {
 template <class Coeff, class Order>
 class Polynomial {
@@ -18,9 +17,9 @@ public:
 
     Polynomial(Coeff coefficient) {
         terms_.emplace(Monomial(), std::move(coefficient));
+        reduce();
     }
 
-    //?
     Polynomial(const Monomial& m) {
         terms_.emplace(m, Coeff(1));
     }
@@ -54,7 +53,6 @@ public:
         for (auto& term : terms_) {
             term.second /= first_coeff;
         }
-        return;
     }
     
     Polynomial& operator+=(const Polynomial& other) {
@@ -67,7 +65,6 @@ public:
         return *this;
     }
 
-    //?
     Polynomial& operator-=(const Polynomial& other) {
         for (const auto& term : other.terms_) {
             terms_[term.first] -= term.second;
@@ -96,7 +93,6 @@ public:
         return result;
     }
 
-    //?
     friend Polynomial operator-(const Polynomial& first, const Polynomial& second) {
         Polynomial result = first;
         result -= second;
@@ -109,6 +105,14 @@ public:
         return result;
     }
     
+    friend bool operator==(const Polynomial& first, const Polynomial& second) {
+        return first.terms_ == second.terms_;
+    }
+
+    friend bool operator!=(const Polynomial& first, const Polynomial& second) {
+        return !(first.terms_ == second.terms_);
+    }
+
     friend std::ostream& operator<<(std::ostream& out, const Polynomial& current) {
         int64_t count = 0;
         for (const auto& term : current.terms_) {
@@ -116,7 +120,8 @@ public:
             if (term.second > 0 && count != 1) {
                 out << " + ";
             }
-            if (term.second != 1 && term.second > 0|| term.second != -1 && term.second < 0) {
+            if (term.second != 1 && term.second > 0|| term.second != -1 && term.second < 0
+                                || (term.second == -1 || term.second == 1) && term.first.get_degrees().size() == 0) {
                 out << term.second;
             } else {
                 if (term.second < 0 && (term.second == -1)) {

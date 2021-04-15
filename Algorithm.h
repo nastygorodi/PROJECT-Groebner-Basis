@@ -6,6 +6,7 @@
 #include "Order.h"
 #include "Polynomial.h"
 #include "Rational.h"
+#include "PolynomialSet.h"
 
 namespace Groebner {
 template <class Coeff, class Order>
@@ -53,6 +54,37 @@ public:
         while (reduction_check(g, f).first == true) {
             make_reduction(g, f);
         }
+    }
+
+    static void complete_reduction_bySet(Polynomial<Coeff, Order>& g, const PolySet<Coeff, Order>& X) {
+        int count_reductions = 1;
+        while (count_reductions != 0) {
+            count_reductions = 0;
+            for (auto& f : X.get_polynomials()) {
+                auto g_old = g;
+                complete_reduction(g, f);
+                if (g_old != g) {
+                    ++count_reductions;
+                }
+            }
+        }
+    }
+
+    static void complete_reduction_SetBySet(PolySet<Coeff, Order>& Y, const PolySet<Coeff, Order>& X) {
+        auto y_container = Y.get_polynomials();
+        auto it = y_container.begin();
+        while (it != y_container.end()) {
+            auto it_ = it;
+            ++it_;
+            auto tmp = y_container.extract(it);
+            complete_reduction_bySet(tmp.value(), X);
+            if (tmp.value() != Coeff(0)) {
+                y_container.insert(move(tmp));
+            }
+            it = it_;
+        }
+        PolySet<Coeff, Order> Y_new = y_container;
+        Y = Y_new;
     }
 };
 }

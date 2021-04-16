@@ -1,11 +1,6 @@
 #pragma once
 #include <iostream>
-#include "Diophantine.h"
-#include "Modular.h"
-#include "Monomial.h"
-#include "Order.h"
 #include "Polynomial.h"
-#include "Rational.h"
 #include "PolynomialSet.h"
 
 namespace Groebner {

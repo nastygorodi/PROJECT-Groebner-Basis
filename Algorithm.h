@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include "Polynomial.h"
 #include "PolynomialSet.h"
 
 namespace Groebner {
@@ -80,6 +79,61 @@ public:
         }
         PolySet<Coeff, Order> Y_new = y_container;
         Y = Y_new;
+    }
+
+    static void autoreduction(PolySet<Coeff, Order>& X) {
+        int count_reductions = 1;
+        PolySet<Coeff, Order> Y;
+        while (count_reductions != 0) {
+            count_reductions = 0;
+            auto it = X.get_polynomials().begin();
+            while (it != X.get_polynomials().end()) {
+                auto it_ = it;
+                ++it_;
+                auto tmp_old = *it;
+                auto tmp = *it;
+                X.exclude(*it);
+                complete_reduction_bySet(tmp, X);
+                complete_reduction_bySet(tmp, Y);
+                if (tmp != Coeff(0)) {
+                    Y.add(tmp);
+                }
+                if (tmp != tmp_old) {
+                    ++count_reductions;
+                }
+                it = it_;
+            }
+            std::swap(X, Y);
+        }
+        X.normalize();
+    }
+
+    static PolySet<Coeff, Order> make_GB(PolySet<Coeff, Order>& X) {
+        autoreduction(X);
+        PolySet<Coeff, Order> Y = X;
+        while (Y.get_polynomials().size() != 0) {
+            X.addSet(Y);
+            autoreduction(X);
+            Y.clear();
+            auto it1 = X.get_polynomials().begin();
+            while (it1 != X.get_polynomials().end()) {
+                auto f1 = *it1;
+                auto it2 = it1;
+                ++it2;
+                while (it2 != X.get_polynomials().end()) {
+                    auto f2 = *it2;
+                    auto S_ij = S(f1, f2);
+                    complete_reduction_bySet(S_ij, X);
+                    if (S_ij != Coeff(0)) {
+                        Y.add(S_ij);
+                    }
+                    ++it2;
+                }
+                ++it1;
+            }
+        }
+        autoreduction(X);
+        return X;
     }
 };
 }

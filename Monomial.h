@@ -11,6 +11,11 @@ public:
 
     Monomial() = default;
 
+    Monomial(IndexType x) {
+        std::map<IndexType, DegreeType> empty;
+        degrees_ = empty;
+    }
+
     Monomial(std::initializer_list<std::pair<IndexType, DegreeType>> list) {
         for (auto pair : list) {
             if (pair.second != 0) {
@@ -45,7 +50,7 @@ public:
                 return false;
             }
         }
-        return true;        
+        return true;      
     }
 
     Monomial& operator/=(const Monomial& divider) {
@@ -86,6 +91,10 @@ public:
         return first.degrees_ == second.degrees_;
     }
 
+    friend bool operator!=(const Monomial& first, const Monomial& second) {
+        return !(first.degrees_ == second.degrees_);
+    }
+
     friend std::ostream& operator<<(std::ostream& out, const Monomial& current) {
         for (auto& degree : current.degrees_) {
             assert(degree.second);
@@ -95,9 +104,20 @@ public:
             }
         }
         return out;
-    }
+    };
 
 private:
+    void reduce() {
+        auto it = degrees_.cbegin();
+        while (it != degrees_.cend()) {
+            if (it ->second == 0) {
+                it = degrees_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
     std::map<IndexType, DegreeType> degrees_;
 };
 

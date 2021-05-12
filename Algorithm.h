@@ -108,29 +108,55 @@ public:
         X.normalize();
     }
 
+    static void make_pairsForTwo(const PolySet<Coeff, Order>& X, const PolySet<Coeff, Order>& Y, PolySet<Coeff, Order>& ans) {
+        auto it1 = X.get_polynomials().begin();
+        while (it1 != X.get_polynomials().end()) {
+            auto f1 = *it1;
+            auto it2 = Y.get_polynomials().begin();
+            while (it2 != Y.get_polynomials().end()) {
+                auto f2 = *it2;
+                auto S_ij = S(f1, f2);
+                complete_reduction_bySet(S_ij, X);
+                complete_reduction_bySet(S_ij, Y);
+                if (S_ij != Coeff(0)) {
+                    ans.add(S_ij);
+                }
+                ++it2;
+            }
+            ++it1;
+        }
+    }
+
+    static void make_pairs(const PolySet<Coeff, Order>& Y, PolySet<Coeff, Order>& ans) {
+        auto it1 = Y.get_polynomials().begin();
+        while (it1 != Y.get_polynomials().end()) {
+            auto f1 = *it1;
+            auto it2 = it1;
+            ++it2;
+            while (it2 != Y.get_polynomials().end()) {
+                auto f2 = *it2;
+                auto S_jk = S(f1, f2);
+                complete_reduction_bySet(S_jk, Y);
+                if (S_jk != Coeff(0)) {
+                    ans.add(S_jk);
+                }
+                ++it2;
+            }
+            ++it1;
+        }
+    }
+
     static PolySet<Coeff, Order> make_GB(PolySet<Coeff, Order>& X) {
         autoreduction(X);
-        PolySet<Coeff, Order> Y = X;
+        PolySet<Coeff, Order> Y, Z;
+        make_pairs(X, Y);
         while (Y.get_polynomials().size() != 0) {
-            X.addSet(Y);
+            Z.clear();
             autoreduction(X);
-            Y.clear();
-            auto it1 = X.get_polynomials().begin();
-            while (it1 != X.get_polynomials().end()) {
-                auto f1 = *it1;
-                auto it2 = it1;
-                ++it2;
-                while (it2 != X.get_polynomials().end()) {
-                    auto f2 = *it2;
-                    auto S_ij = S(f1, f2);
-                    complete_reduction_bySet(S_ij, X);
-                    if (S_ij != Coeff(0)) {
-                        Y.add(S_ij);
-                    }
-                    ++it2;
-                }
-                ++it1;
-            }
+            make_pairsForTwo(X, Y, Z);
+            make_pairs(Y, Z);
+            X.addSet(Y);
+            Y = Z;
         }
         autoreduction(X);
         return X;

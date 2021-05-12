@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include "Polynomial.h"
 #include "PolynomialOrder.h"
 #include <set>
 
@@ -60,7 +59,7 @@ public:
             auto it_ = it;
             ++it_;
             auto tmp = polynomials_.extract(it);
-            tmp.value().norm();
+            tmp.value().normalize();
             polynomials_.insert(move(tmp));
             it = it_;
         }

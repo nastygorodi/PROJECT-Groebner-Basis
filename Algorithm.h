@@ -24,12 +24,9 @@ public:
         return result;
     }
 
-    static void make_reduction(Polynomial<Coeff, Order>& g, const Polynomial<Coeff, Order>& f) {
-        auto it = reduction_check(g, f).second;
-        if (it != g.get_terms().end()) {
-            auto m1 = it->first / L(f);
-            g = f.coeff_of(L(f)) * g - it->second * (m1 * f);
-        }
+    static void make_reduction(Polynomial<Coeff, Order>& g, const Polynomial<Coeff, Order>& f, typename std::map<Monomial, Coeff, Reverse<Order>>::const_iterator it) {
+        auto m1 = it->first / L(f);
+        g = f.coeff_of(L(f)) * g - it->second * (m1 * f);
     }
 
     static std::pair<bool, typename std::map<Monomial, Coeff, Reverse<Order>>::const_iterator> reduction_check(const Polynomial<Coeff, Order>& g, const Polynomial<Coeff, Order>& f) {
@@ -46,7 +43,7 @@ public:
 
     static void complete_reduction(Polynomial<Coeff, Order>& g, const Polynomial<Coeff, Order>& f) {
         while (reduction_check(g, f).first == true) {
-            make_reduction(g, f);
+            make_reduction(g, f, reduction_check(g, f).second);
         }
     }
 
@@ -115,6 +112,10 @@ public:
             auto it2 = Y.get_polynomials().begin();
             while (it2 != Y.get_polynomials().end()) {
                 auto f2 = *it2;
+                if (Monomial::gcd(L(f1), L(f2)) == 1) {
+                    ++it2;
+                    continue;
+                }
                 auto S_ij = S(f1, f2);
                 complete_reduction_bySet(S_ij, X);
                 complete_reduction_bySet(S_ij, Y);
@@ -135,6 +136,10 @@ public:
             ++it2;
             while (it2 != Y.get_polynomials().end()) {
                 auto f2 = *it2;
+                if (Monomial::gcd(L(f1), L(f2)) == 1) {
+                    ++it2;
+                    continue;
+                }
                 auto S_jk = S(f1, f2);
                 complete_reduction_bySet(S_jk, Y);
                 if (S_jk != Coeff(0)) {

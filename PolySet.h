@@ -17,7 +17,7 @@ public:
 
     PolySet(std::initializer_list<Polynomial<Coeff, Order>> polynomials) {
         for (auto p : polynomials) {
-            if (p != 0) {
+            if (p != Coeff(0)) {
                 polynomials_.emplace(p);
             }
         }
@@ -76,7 +76,7 @@ private:
     void reduce() {
         auto it = polynomials_.cbegin();
         while (it != polynomials_.cend()) {
-            if (*it == Polynomial<Coeff, Order>(0)) {
+            if (*it == Coeff(0)) {
                 it = polynomials_.erase(it);
             } else {
                 ++it;

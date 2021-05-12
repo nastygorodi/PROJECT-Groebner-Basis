@@ -4,7 +4,6 @@
 #include <map>
 #include <math.h>
 #include "Modular.h"
-#include "Monomial.h"
 #include "Order.h"
 #include "Rational.h"
 
@@ -20,6 +19,7 @@ public:
         reduce();
     }
 
+    //?
     Polynomial(const Monomial& m) {
         terms_.emplace(m, Coeff(1));
     }
@@ -45,7 +45,7 @@ public:
         return terms_;
     }
 
-    void norm() {
+    void normalize() {
         if (terms_.size() == 0) {
             return;
         }

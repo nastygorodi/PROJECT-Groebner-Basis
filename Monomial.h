@@ -5,11 +5,16 @@
 
 namespace Groebner {
 class Monomial {
-public:
+ public:
     using IndexType = std::int64_t;
     using DegreeType = std::uint64_t;
 
     Monomial() = default;
+
+    Monomial(IndexType x) {
+        std::map<IndexType, DegreeType> empty;
+        degrees_ = empty;
+    }
 
     Monomial(std::initializer_list<std::pair<IndexType, DegreeType>> list) {
         for (auto pair : list) {
@@ -45,7 +50,7 @@ public:
                 return false;
             }
         }
-        return true;        
+        return true;
     }
 
     Monomial& operator/=(const Monomial& divider) {
@@ -63,10 +68,42 @@ public:
         Monomial result;
         for (const auto& degree : first.degrees_) {
             auto gcd_degree = std::min(degree.second, second.degree_of_variable(degree.first));
-            if (gcd_degree > 0)
-            result.degrees_.emplace(degree.first, gcd_degree);
+            if (gcd_degree > 0) result.degrees_.emplace(degree.first, gcd_degree);
         }
         return result;
+    }
+
+    // least common multiple
+    static Monomial lcm(const Monomial& first, const Monomial& second) {
+        Monomial result = first;
+        for (const auto& degree : second.degrees_) {
+            if (result.degree_of_variable(degree.first) == 0) {
+                result.degrees_.emplace(degree.first, degree.second);
+            } else {
+                result.degrees_[degree.first] = std::max(result.degree_of_variable(degree.first), degree.second);
+            }
+        }
+        return result;
+    }
+
+    friend Monomial operator*(const Monomial& first, const Monomial& second) {
+        Monomial result = first;
+        result *= second;
+        return result;
+    }
+
+    friend Monomial operator/(const Monomial& first, const Monomial& second) {
+        Monomial result = first;
+        result /= second;
+        return result;
+    }
+
+    friend bool operator==(const Monomial& first, const Monomial& second) {
+        return first.degrees_ == second.degrees_;
+    }
+
+    friend bool operator!=(const Monomial& first, const Monomial& second) {
+        return !(first.degrees_ == second.degrees_);
     }
 
     friend std::ostream& operator<<(std::ostream& out, const Monomial& current) {
@@ -78,21 +115,20 @@ public:
             }
         }
         return out;
+    };
+
+ private:
+    void reduce() {
+        auto it = degrees_.cbegin();
+        while (it != degrees_.cend()) {
+            if (it->second == 0) {
+                it = degrees_.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 
-private:
     std::map<IndexType, DegreeType> degrees_;
 };
-
-Monomial operator*(const Monomial& first, const Monomial& second) {
-    Monomial result = first;
-    result *= second;
-    return result;
-}
-
-Monomial operator/(const Monomial& first, const Monomial& second) {
-    Monomial result = first;
-    result /= second;
-    return result;
-}
-}
+}  // namespace Groebner

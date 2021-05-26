@@ -4,7 +4,7 @@
 
 namespace Groebner {
 class Rational {
-public:
+ public:
     using IntegralType = std::int64_t;
     Rational() = default;
 
@@ -24,7 +24,6 @@ public:
     IntegralType denominator() const {
         return denominator_;
     }
-
 
     Rational operator+() const {
         return *this;
@@ -63,7 +62,64 @@ public:
         return *this;
     }
 
-private:
+    friend Rational operator+(const Rational& first, const Rational& second) {
+        Rational result = first;
+        result += second;
+        return result;
+    }
+
+    friend Rational operator-(const Rational& first, const Rational& second) {
+        Rational result = first;
+        result -= second;
+        return result;
+    }
+
+    friend Rational operator*(const Rational& first, const Rational& second) {
+        Rational result = first;
+        result *= second;
+        return result;
+    }
+
+    friend Rational operator/(const Rational& first, const Rational& second) {
+        Rational result = first;
+        result /= second;
+        return result;
+    }
+
+    friend bool operator==(const Rational& first, const Rational& second) {
+        return first.numerator() == second.numerator() && first.denominator() == second.denominator();
+    }
+
+    friend bool operator!=(const Rational& first, const Rational& second) {
+        return !(first == second);
+    }
+
+    friend bool operator<(const Rational& first, const Rational& second) {
+        return (first - second).numerator() < 0;
+    }
+
+    friend bool operator>(const Rational& first, const Rational& second) {
+        return second < first;
+    }
+
+    friend bool operator<=(const Rational& first, const Rational& second) {
+        return !(first > second);
+    }
+
+    friend bool operator>=(const Rational& first, const Rational& second) {
+        return !(first < second);
+    }
+
+    friend std::ostream& operator<<(std::ostream& out, const Rational& current) {
+        out << current.numerator();
+        if (current.denominator() != 1) {
+            out << "/";
+            out << current.denominator();
+        }
+        return out;
+    }
+
+ private:
     void reduce() {
         IntegralType divider_ = std::gcd(numerator_, denominator_);
         numerator_ /= divider_;
@@ -77,62 +133,4 @@ private:
     IntegralType numerator_ = 0;
     IntegralType denominator_ = 1;
 };
-
-Rational operator+(const Rational& first, const Rational& second) {
-    Rational result = first;
-    result += second;
-    return result;
-}
-
-Rational operator-(const Rational& first, const Rational& second) {
-    Rational result = first;
-    result -= second;
-    return result;
-}
-
-Rational operator*(const Rational& first, const Rational& second) {
-    Rational result = first;
-    result *= second;
-    return result;
-}
-
-Rational operator/(const Rational& first, const Rational& second) {
-    Rational result = first;
-    result /= second;
-    return result;
-}
-
-bool operator==(const Rational& first, const Rational& second) {
-    return first.numerator() == second.numerator() &&
-     first.denominator() == second.denominator();
-}
-
-bool operator!=(const Rational& first, const Rational& second) {
-    return !(first == second);
-}
-
-bool operator<(const Rational& first, const Rational& second) {
-    return (first - second).numerator() < 0;
-}
-
-bool operator>(const Rational& first, const Rational& second) {
-    return second < first;
-}
-
-bool operator<=(const Rational& first, const Rational& second) {
-    return !(first > second);
-}
-
-bool operator>=(const Rational& first, const Rational& second) {
-    return !(first < second);
-}
-
-std::ostream& operator<<(std::ostream& out, const Rational& current) {
-    out << current.numerator();
-    if (current.denominator() != 1) {
-        out << "/";
-        out << current.denominator();
-    }
-    return out;
-};
-}
+}  // namespace Groebner

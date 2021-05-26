@@ -1,13 +1,14 @@
 #pragma once
 #include <iostream>
-#include "PolynomialOrder.h"
 #include <set>
+
+#include "PolynomialOrder.h"
 
 namespace Groebner {
 
 template <class Coeff, class Order>
 class PolySet {
-public:
+ public:
     using PolyContainer = std::set<Polynomial<Coeff, Order>, PolynomialOrder<Coeff, Order>>;
     PolySet() = default;
 
@@ -46,11 +47,8 @@ public:
         polynomials_.clear();
     }
 
-    void exclude(const Polynomial<Coeff, Order>& p) {
-        auto it = std::find_if(polynomials_.begin(), polynomials_.end(), [&p](const auto& x) {return x == p;});
-        if (it != polynomials_.end()) {
-            polynomials_.erase(it);
-        }
+    void exclude(typename std::set<Polynomial<Coeff, Order>, PolynomialOrder<Coeff, Order>>::const_iterator it) {
+        polynomials_.erase(it);
     }
 
     void normalize() {
@@ -67,12 +65,12 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const PolySet<Coeff, Order>& current) {
         for (const auto& p : current.polynomials_) {
-            out << p << " ; ";
+            out << p << " ;\n";
         }
         return out;
     }
 
-private:
+ private:
     void reduce() {
         auto it = polynomials_.cbegin();
         while (it != polynomials_.cend()) {
@@ -83,7 +81,7 @@ private:
             }
         }
     }
-    
+
     PolyContainer polynomials_;
 };
-}
+}  // namespace Groebner

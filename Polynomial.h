@@ -1,8 +1,10 @@
 #pragma once
+#include <math.h>
+
 #include <initializer_list>
 #include <iostream>
 #include <map>
-#include <math.h>
+
 #include "Modular.h"
 #include "Order.h"
 #include "Rational.h"
@@ -10,7 +12,7 @@
 namespace Groebner {
 template <class Coeff, class Order>
 class Polynomial {
-public:
+ public:
     using TermsContainer = std::map<Monomial, Coeff, Reverse<Order>>;
     Polynomial() = default;
 
@@ -19,7 +21,6 @@ public:
         reduce();
     }
 
-    //?
     Polynomial(const Monomial& m) {
         terms_.emplace(m, Coeff(1));
     }
@@ -54,7 +55,7 @@ public:
             term.second /= first_coeff;
         }
     }
-    
+
     Polynomial& operator+=(const Polynomial& other) {
         for (const auto& term : other.terms_) {
             terms_[term.first] += term.second;
@@ -104,7 +105,7 @@ public:
         result *= second;
         return result;
     }
-    
+
     friend bool operator==(const Polynomial& first, const Polynomial& second) {
         return first.terms_ == second.terms_;
     }
@@ -120,9 +121,8 @@ public:
             if (term.second > 0 && count != 1) {
                 out << " + ";
             }
-            if (term.second != 1 && term.second > 0|| term.second != -1 && term.second < 0
-                                || (term.second == -1 || term.second == 1) && term.first.get_degrees().size() == 0) {
-                out << term.second;
+            if ((term.second != 1 && term.second > 0) || (term.second != -1 && term.second < 0) || ((term.second == -1 || term.second == 1) && term.first.get_degrees().size() == 0)) {
+                out << " " << term.second << " ";
             } else {
                 if (term.second < 0 && (term.second == -1)) {
                     out << " - ";
@@ -133,11 +133,11 @@ public:
         return out;
     }
 
-private:
+ private:
     void reduce() {
         auto it = terms_.cbegin();
         while (it != terms_.cend()) {
-            if (it ->second == 0) {
+            if (it->second == 0) {
                 it = terms_.erase(it);
             } else {
                 ++it;
@@ -147,4 +147,4 @@ private:
 
     TermsContainer terms_;
 };
-}
+}  // namespace Groebner

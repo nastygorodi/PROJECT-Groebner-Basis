@@ -1,15 +1,17 @@
 #pragma once
-#include"Diophantine.h"
 #include <iostream>
 #include <numeric>
+
+#include "Diophantine.h"
 
 namespace Groebner {
 template <std::int64_t mod>
 class Modular {
-static_assert(mod > 0, "The modulus must be positive!");
-public:
+    static_assert(mod > 0, "The modulus must be positive!");
+
+ public:
     using IntegralType = std::int64_t;
-    Modular () = default;
+    Modular() = default;
 
     Modular(IntegralType number) : number_(number) {
         reduce();
@@ -87,7 +89,7 @@ public:
     friend bool operator<(const Modular& first, const Modular& second) {
         return first.canonical_remainder() < second.canonical_remainder();
     }
-    
+
     friend bool operator>(const Modular& first, const Modular& second) {
         return second < first;
     }
@@ -103,11 +105,12 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const Modular& current) {
         return out << current.canonical_remainder();
     }
-private:
+
+ private:
     void reduce() {
         number_ = ((number_ % mod) + mod) % mod;
     }
 
     IntegralType number_ = 0;
 };
-}
+}  // namespace Groebner

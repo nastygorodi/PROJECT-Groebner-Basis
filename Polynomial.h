@@ -42,6 +42,19 @@ class Polynomial {
         return 0;
     }
 
+    Polynomial coeff_of_variable(const Monomial& m, const Monomial& check) const {
+        Polynomial ans;
+        for (auto& term : terms_) {
+            if (term.first.is_divisible_by(m)) {
+                auto tmp = term.first / m;
+                if (!tmp.is_divisible_by(check)) {
+                    ans += tmp;
+                }
+            }
+        }
+        return ans;
+    }
+
     const TermsContainer& get_terms() const {
         return terms_;
     }

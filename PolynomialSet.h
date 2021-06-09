@@ -17,9 +17,9 @@ class PolySet {
     }
 
     PolySet(std::initializer_list<Polynomial<Coeff, Order>> polynomials) {
-        for (auto p : polynomials) {
+        for (auto& p : polynomials) {
             if (p != Coeff(0)) {
-                polynomials_.emplace(p);
+                polynomials_.emplace(std::move(p));
             }
         }
     }
